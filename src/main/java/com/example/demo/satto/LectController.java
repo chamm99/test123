@@ -18,6 +18,7 @@ public class LectController {
 
         List<TimeTableResponseDTO.lectDetail> result = lectService.getLectByMajorAndYear(major, year);
         return result;
+
     }
 
     @GetMapping("/majorTimeTable")
@@ -41,5 +42,17 @@ public class LectController {
         return lectService.createTimeTable(majorTimaTable);
 
     }
+    @GetMapping("/recommendedLibLects/timeTable")
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects(@RequestBody TimeTableCreateDTO createDTO,
+                                                                         @RequestParam int libCount){
+        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTable(createDTO);
+        return lectService.recommendLibLectures(majorTimaTable, libCount);
+    }
 
+    @GetMapping("/recommendedLibLects/test")
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects(@RequestBody dto dto,
+                                                                         @RequestParam int libCount){
+        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName(dto.getName1(), dto.getName2(), dto.getName3());
+        return lectService.recommendLibLectures(majorTimaTable, libCount);
+    }
 }

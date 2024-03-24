@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -99,6 +100,34 @@ public class LectService {
 
         return timeTable;
     }
+//    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName(String name1, String name2, String name3, String name4) {
+//
+//        List<Lect> majorLectList = lectRepository.findLectByName(name1,name2,name3,name4);
+//        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
+//
+//        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
+//        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
+//
+//        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 4);
+//
+//        System.out.println("전공 강의 조합 개수 : " + majorCount);
+//
+//        return timeTable;
+//    }
+//    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName(String name1, String name2, String name3, String name4, String name5) {
+//
+//        List<Lect> majorLectList = lectRepository.findLectByName(name1,name2,name3,name4,name5);
+//        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
+//
+//        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
+//        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
+//
+//        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 5);
+//
+//        System.out.println("전공 강의 조합 개수 : " + majorCount);
+//
+//        return timeTable;
+//    }
 
     public List<List<TimeTableResponseDTO.lectDetail>> createTimeTable(TimeTableCreateDTO createDTO,
                                                                        List<List<TimeTableResponseDTO.lectDetail>> majorTimeTable){
@@ -193,6 +222,27 @@ public class LectService {
                 current.remove(current.size() - 1);
             }
         }
+    }
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLectures(List<List<TimeTableResponseDTO.lectDetail>> majorTimeTable, int libCount) {
+        List<Lect> entireLect = lectRepository.findLectExceptGyoinSabong("교선");
+        List<TimeTableResponseDTO.lectDetail> entireLectDetailList = TimeTableResponseDTO.lectDetail.from(entireLect);
+
+        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
+
+        // 추천 교양 목록 생성
+        Collections.shuffle(entireLectDetailList); // 교양 목록을 랜덤하게 섞음
+
+        // 제한된 개수만큼 교양 목록을 선택
+        List<TimeTableResponseDTO.lectDetail> recommendedLectures = entireLectDetailList.subList(0, Math.min(libCount, entireLectDetailList.size()));
+        for(int i = 0; i < majorTimeTable.size(); i++){
+            generateCombinations1(recommendedLectures, 0, majorTimeTable.get(i), timeTable, 6);
+
+        }
+        System.out.println("교선 강의 개수(교양과인성, 사회봉사 제외) : " + recommendedLectures.size());
+        System.out.println("전공 강의 조합 개수 : " + majorCount);
+        System.out.println("전체 강의 조합 개수 : " + count);
+
+        return timeTable;
     }
 //    private static void generateCombinations(List<TimeTableResponseDTO.lectDetail> majorLectures,
 //                                             int start,

@@ -31,8 +31,8 @@ public class SwaggerConfig {
         license.setName("{Application}");
 
         return new Info()
-                .title("Rythmn Palette API Document")
-                .description("This is Rythmn Palette's API document.")
+                .title("SATTO Alogrithm API Document")
+                .description("This is SATTO's API document.")
                 .version("v0.0.1")
                 .license(license);
     }
