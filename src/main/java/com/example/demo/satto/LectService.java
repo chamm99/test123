@@ -3,10 +3,7 @@ package com.example.demo.satto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -100,34 +97,34 @@ public class LectService {
 
         return timeTable;
     }
-//    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName(String name1, String name2, String name3, String name4) {
-//
-//        List<Lect> majorLectList = lectRepository.findLectByName(name1,name2,name3,name4);
-//        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
-//
-//        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
-//        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
-//
-//        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 4);
-//
-//        System.out.println("전공 강의 조합 개수 : " + majorCount);
-//
-//        return timeTable;
-//    }
-//    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName(String name1, String name2, String name3, String name4, String name5) {
-//
-//        List<Lect> majorLectList = lectRepository.findLectByName(name1,name2,name3,name4,name5);
-//        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
-//
-//        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
-//        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
-//
-//        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 5);
-//
-//        System.out.println("전공 강의 조합 개수 : " + majorCount);
-//
-//        return timeTable;
-//    }
+    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName4(String name1, String name2, String name3, String name4) {
+
+        List<Lect> majorLectList = lectRepository.findLectByName4(name1,name2,name3,name4);
+        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
+
+        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
+        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
+
+        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 4);
+
+        System.out.println("전공 강의 조합 개수 : " + majorCount);
+
+        return timeTable;
+    }
+    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName5(String name1, String name2, String name3, String name4, String name5) {
+
+        List<Lect> majorLectList = lectRepository.findLectByName5(name1,name2,name3,name4,name5);
+        List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
+
+        List<TimeTableResponseDTO.lectDetail> lectDetailList = new ArrayList<>();
+        List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
+
+        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 5);
+
+        System.out.println("전공 강의 조합 개수 : " + majorCount);
+
+        return timeTable;
+    }
 
     public List<List<TimeTableResponseDTO.lectDetail>> createTimeTable(TimeTableCreateDTO createDTO,
                                                                        List<List<TimeTableResponseDTO.lectDetail>> majorTimeTable){

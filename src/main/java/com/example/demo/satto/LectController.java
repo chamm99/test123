@@ -36,7 +36,7 @@ public class LectController {
 
     }
     @GetMapping("/test")
-    public List<List<TimeTableResponseDTO.lectDetail>> test(@RequestBody dto dto){
+    public List<List<TimeTableResponseDTO.lectDetail>> test(@RequestBody dto3 dto){
 
         List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName(dto.getName1(), dto.getName2(), dto.getName3());
         return lectService.createTimeTable(majorTimaTable);
@@ -50,9 +50,24 @@ public class LectController {
     }
 
     @GetMapping("/recommendedLibLects/test")
-    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects(@RequestBody dto dto,
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects(@RequestBody dto3 dto3,
                                                                          @RequestParam int libCount){
-        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName(dto.getName1(), dto.getName2(), dto.getName3());
+        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName(dto3.getName1(), dto3.getName2(), dto3.getName3());
         return lectService.recommendLibLectures(majorTimaTable, libCount);
     }
+    @GetMapping("/recommendedLibLects/test4")
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects4(@RequestBody dto4 dto4,
+                                                                         @RequestParam int libCount){
+        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName4(dto4.getName1(), dto4.getName2(), dto4.getName3(), dto4.getName4());
+        return lectService.recommendLibLectures(majorTimaTable, libCount);
+    }
+
+    @GetMapping("/recommendedLibLects/test5")
+    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects5(@RequestBody dto5 dto5,
+                                                                         @RequestParam int libCount){
+        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName5(dto5.getName1(), dto5.getName2(), dto5.getName3(), dto5.getName4(), dto5.getName5());
+        return lectService.recommendLibLectures(majorTimaTable, libCount);
+    }
+
+
 }

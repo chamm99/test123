@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Optional;
 
 @Getter
-public class dto {
+public class dto3 {
 
     private String name1;
     private String name2;

@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LectRepository extends JpaRepository<Lect,String> {
@@ -33,10 +34,10 @@ public interface LectRepository extends JpaRepository<Lect,String> {
     @Query("select  l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3")
     List<Lect> findLectByName(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3);
 
-//    @Query("select  l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3")
-//    List<Lect> findLectByName(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3, @Param("name4") String name4);
-//
-//    @Query("select  l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3")
-//    List<Lect> findLectByName(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3, @Param("name4") String name4, @Param("name5") String name5);
+    @Query("select  l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3 or l.sbjNm = :name4")
+    List<Lect> findLectByName4(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3, @Param("name4") String name4);
+
+    @Query("select l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3 or l.sbjNm = :name4 or l.sbjNm = :name5")
+    List<Lect> findLectByName5(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3, @Param("name4") String name4, @Param("name5") String name5);
 
 }
