@@ -32,21 +32,50 @@ public class TimeTableResponseDTO {
         public static List<lectDetail> from(List<Lect> lectList) {
             return lectList.stream().map(lect -> lectDetail.from(lect)).collect(Collectors.toList());
         }
+
+        @Override
+        public String toString() {
+            return "lectDetail{" +
+                    "sbjDivcls='" + sbjDivcls + '\'' +
+                    ", sbjNo='" + sbjNo + '\'' +
+                    ", name='" + name + '\'' +
+                    ", time='" + time + '\'' +
+                    '}';
+        }
     }
 
-        @Builder
-        @Getter
-        public static class timeTable {
-            private List<lectDetail> timetable;
-            private int count;
+    @Builder
+    @Getter
+    public static class timeTable {
+        private List<lectDetail> timetable;
+        private String totalTime;
 
-            public static timeTable from(List<lectDetail> timetable) {
-                return timeTable.builder()
-                        .timetable(timetable)
-                        .count(timetable.size())
-                        .build();
+        public static String calculateTotalTime(List<lectDetail> timetable) {
+            String tt = "";
+            for (lectDetail lecture : timetable) {
+                tt += lecture.getTime();
             }
-
+            return tt;
         }
+
+
+        public static timeTable from(List<lectDetail> lectList) {
+            return timeTable.builder()
+                    .timetable(lectList)
+                    .totalTime(calculateTotalTime(lectList))
+                    .build();
+        }
+        public static List<timeTable> of(List<List<lectDetail>> lectList) {
+            return lectList.stream().map(lectDetail -> timeTable.from(lectDetail)).collect(Collectors.toList());
+        }
+
+        @Override
+        public String toString() {
+            return "timeTable{" +
+                    "timetable=" + timetable +
+                    ", totalTime='" + totalTime + '\'' +
+                    '}';
+        }
+    }
 
     }

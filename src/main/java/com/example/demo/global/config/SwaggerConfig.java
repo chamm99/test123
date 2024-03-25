@@ -43,7 +43,7 @@ public class SwaggerConfig {
                         "access-token",
                         new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
+                                .scheme("Bearer")
                                 .bearerFormat("JWT"));
     }
 }

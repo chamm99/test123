@@ -69,5 +69,10 @@ public class LectController {
         return lectService.recommendLibLectures(majorTimaTable, libCount);
     }
 
-
+    @GetMapping("/findBigGG")
+    public List<TimeTableResponseDTO.timeTable> searchBigGG(@RequestBody dto3 dto5){
+        List<TimeTableResponseDTO.timeTable> majorTimaTable = lectService.createMajorTimeTableByName(dto5);
+        List<TimeTableResponseDTO.timeTable> filtered = lectService.findBigGonggang(majorTimaTable);
+        return lectService.filterOneLect(lectService.findWholeGG(filtered));
+    }
 }
