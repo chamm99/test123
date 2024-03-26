@@ -206,7 +206,6 @@ public class LectService {
         List<TimeTableResponseDTO.lectDetail> recommendedLectures = entireLectDetailList.subList(0, Math.min(libCount, entireLectDetailList.size()));
         for (List<TimeTableResponseDTO.lectDetail> lectDetails : majorTimeTable) {
             generateCombinations1(recommendedLectures, 0, lectDetails, timeTable, 6);
-
         }
         System.out.println("교선 강의 개수(교양과인성, 사회봉사 제외) : " + recommendedLectures.size());
         System.out.println("전공 강의 조합 개수 : " + majorCount);
@@ -214,9 +213,9 @@ public class LectService {
 
         return timeTable;
     }
-
     public List<TimeTableResponseDTO.timeTable> optimizationTimeTable(List<TimeTableResponseDTO.timeTable> timeTables){
 
+        List<Integer> toRemoveIndexes = new ArrayList<>();
         for(int i = 0; i < timeTables.size(); i++){
 
             Map<Character, TreeSet<Integer>> scheduleMap = new HashMap<>();
@@ -244,31 +243,34 @@ public class LectService {
                     }
                     prevTime = currentTime;
                 }
-                if (hasThreeHourGap) {
-                    break; // 현재 시간표에서 3교시 이상 비어있는 부분을 찾았으면 더 이상 확인하지 않음
+                if (!hasThreeHourGap) {
+                    break; // 현재 시간표에서 3교시 이상 비어있지 않는 부분을 찾았으면 더 이상 확인하지 않음
                 }
             }
-            if (!hasThreeHourGap) {
-                // 3교시 이상 비어있지 않으면 결과 리스트에 추가
-                timeTables.remove(i);
+            if (hasThreeHourGap) {
+                // 3교시 이상 비어있는 경우 리스트에서 제거
+                toRemoveIndexes.add(i);
             }
+        }
+        Collections.reverse(toRemoveIndexes);
+        for (int index : toRemoveIndexes) {
+            timeTables.remove(index);
         }
 
         return timeTables;
     }
-    public List<TimeTableResponseDTO.timeTable> findBigGonggang(List<TimeTableResponseDTO.timeTable> majorTimeTable){
+    public List<TimeTableResponseDTO.timeTable> createFilteredTimeTable(List<TimeTableResponseDTO.timeTable> majorTimeTable){
 
         List<Lect> entireLect = lectRepository.findLectByCmpDivNm("교선");
         List<TimeTableResponseDTO.lectDetail> entireLectDetailList = TimeTableResponseDTO.lectDetail.from(entireLect);
 
         List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
 
-
         for(int i = 0; i < majorTimeTable.size(); i++){
             generateCombinations1(entireLectDetailList, 0, majorTimeTable.get(i).getTimetable(), timeTable, 4);
         }
         List<TimeTableResponseDTO.timeTable> timeTableList = TimeTableResponseDTO.timeTable.of(timeTable);
-        optimizationTimeTable(timeTableList);
+        filterMorningLect(findWholeGG(filterOneLect(optimizationTimeTable(timeTableList))));
         System.out.println("교선 강의 개수(교양과인성, 사회봉사, 성공학특강, 이러닝 제외) : " + entireLect.size());
         System.out.println("전공 강의 조합 개수 : " + majorCount);
         System.out.println("전체 강의 조합 개수 : " + timeTableList.size());
@@ -327,7 +329,23 @@ public class LectService {
 
         return timeTables;
     }
+    //1교시 포함 시간표 제거
+    public List<TimeTableResponseDTO.timeTable> filterMorningLect(List<TimeTableResponseDTO.timeTable> timeTables) {
+        List<Integer> toRemoveIndexes = new ArrayList<>();
+        for (int i = 0; i < timeTables.size(); i++) {
+            if(timeTables.get(i).getTotalTime().contains("1")) {
+                toRemoveIndexes.add(i);
+            }
+        }
 
+        // 뒤에서부터 제거하여 인덱스 변화를 방지
+        Collections.reverse(toRemoveIndexes);
+        for (int index : toRemoveIndexes) {
+            timeTables.remove(index);
+        }
+
+        return timeTables;
+    }
     //통 공강 찾기
     public List<TimeTableResponseDTO.timeTable> findWholeGG(List<TimeTableResponseDTO.timeTable> timeTables) {
         // 제거하기 위한 인덱스 리스트
@@ -355,6 +373,61 @@ public class LectService {
         }
 
         // 뒤에서부터 제거하여 인덱스 변화를 방지
+        Collections.reverse(toRemoveIndexes);
+        for (int index : toRemoveIndexes) {
+            timeTables.remove(index);
+        }
+
+        return timeTables;
+    }
+    public List<TimeTableResponseDTO.timeTable> find7HourKeepGoing(List<TimeTableResponseDTO.timeTable> timeTables){
+
+        List<Integer> toRemoveIndexes = new ArrayList<>();
+        for(int i = 0; i < timeTables.size(); i++){
+
+            Map<Character, TreeSet<Integer>> scheduleMap = new HashMap<>();
+            String[] parts = timeTables.get(i).getTotalTime().split(" ");
+            for (String part : parts) {
+                char day = part.charAt(0); // 요일
+                int time = Integer.parseInt(part.substring(1)); // 시간
+
+                // 해당 요일에 대한 TreeSet이 없으면 생성
+                scheduleMap.putIfAbsent(day, new TreeSet<>());
+                // 시간 추가
+                scheduleMap.get(day).add(time);
+            }
+
+            boolean hasSevenHourContinuous = false;
+            // 각 요일별로 시간대 확인
+            for (TreeSet<Integer> times : scheduleMap.values()) {
+                // 연속 시간 확인
+                Integer firstTime = null;
+                Integer lastTime = null;
+                for (Integer currentTime : times) {
+                    if (firstTime == null) {
+                        firstTime = currentTime;
+                        lastTime = currentTime;
+                    } else if (currentTime - lastTime == 1) {
+                        lastTime = currentTime;
+                        // 연속되는 시간이 7시간 이상인지 확인
+                        if (lastTime - firstTime >= 6) {
+                            hasSevenHourContinuous = true;
+                            break;
+                        }
+                    } else {
+                        firstTime = currentTime;
+                        lastTime = currentTime;
+                    }
+                }
+                if (hasSevenHourContinuous) {
+                    break; // 7시간 이상 연속되는 경우 찾았으면 더 이상 확인하지 않음
+                }
+            }
+            if (hasSevenHourContinuous) {
+                // 7시간 이상 연속된 경우 리스트에서 제거
+                toRemoveIndexes.add(i);
+            }
+        }
         Collections.reverse(toRemoveIndexes);
         for (int index : toRemoveIndexes) {
             timeTables.remove(index);

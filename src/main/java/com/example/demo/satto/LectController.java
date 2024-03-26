@@ -1,6 +1,7 @@
 package com.example.demo.satto;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class LectController {
         return lectService.createTimeTable(createDTO, majorTimaTable);
 
     }
+
     @GetMapping("/test")
     public List<List<TimeTableResponseDTO.lectDetail>> test(@RequestBody dto3 dto){
 
@@ -42,11 +44,13 @@ public class LectController {
         return lectService.createTimeTable(majorTimaTable);
 
     }
+
     @GetMapping("/recommendedLibLects/timeTable")
-    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects(@RequestBody TimeTableCreateDTO createDTO,
+    public List<TimeTableResponseDTO.timeTable> recommendLibLects(@RequestBody TimeTableCreateDTO createDTO,
                                                                          @RequestParam int libCount){
         List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTable(createDTO);
-        return lectService.recommendLibLectures(majorTimaTable, libCount);
+        List<TimeTableResponseDTO.timeTable> timeTable = TimeTableResponseDTO.timeTable.of(lectService.recommendLibLectures(majorTimaTable, libCount));
+        return lectService.optimizationTimeTable(lectService.filterOneLect(lectService.findWholeGG(timeTable)));
     }
 
     @GetMapping("/recommendedLibLects/test")
@@ -55,6 +59,7 @@ public class LectController {
         List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName(dto3.getName1(), dto3.getName2(), dto3.getName3());
         return lectService.recommendLibLectures(majorTimaTable, libCount);
     }
+
     @GetMapping("/recommendedLibLects/test4")
     public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects4(@RequestBody dto4 dto4,
                                                                          @RequestParam int libCount){
@@ -72,7 +77,7 @@ public class LectController {
     @GetMapping("/findBigGG")
     public List<TimeTableResponseDTO.timeTable> searchBigGG(@RequestBody dto3 dto5){
         List<TimeTableResponseDTO.timeTable> majorTimaTable = lectService.createMajorTimeTableByName(dto5);
-        List<TimeTableResponseDTO.timeTable> filtered = lectService.findBigGonggang(majorTimaTable);
-        return lectService.filterOneLect(lectService.findWholeGG(filtered));
+        return lectService.createFilteredTimeTable(majorTimaTable);
     }
+
 }
