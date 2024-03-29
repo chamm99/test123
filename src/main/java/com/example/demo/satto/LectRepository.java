@@ -34,7 +34,7 @@ public interface LectRepository extends JpaRepository<Lect,String> {
     @Query("select l from Lect l where l.estDeptInfo = '컴퓨터과학전공' and (l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3)")
     List<Lect> findLectByName(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3);
 
-    @Query("select  l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3 or l.sbjNm = :name4")
+    @Query("select  l from Lect l where l.estDeptInfo = '컴퓨터과학전공' and (l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3 or l.sbjNm = :name4)")
     List<Lect> findLectByName4(@Param("name") String name, @Param("name2") String name2, @Param("name3") String name3, @Param("name4") String name4);
 
     @Query("select l from Lect l where l.sbjNm = :name or l.sbjNm = :name2 or l.sbjNm = :name3 or l.sbjNm = :name4 or l.sbjNm = :name5")

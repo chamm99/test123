@@ -7,7 +7,6 @@ import com.example.demo.satto.dto3;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,7 @@ public class ServiceTest {
         dto.setName3("운영체제");
         List<TimeTableResponseDTO.timeTable> majorTimeTable = lectService.createMajorTimeTableByName(dto);
         List<TimeTableResponseDTO.timeTable> timeTable = lectService.findBigGonggang(majorTimeTable);
-        List<TimeTableResponseDTO.timeTable> timeTables = lectService.filterOneLect(timeTable);
+        List<TimeTableResponseDTO.timeTable> timeTables = lectService.filtering2(timeTable);
         for (TimeTableResponseDTO.timeTable table : timeTables) {
             System.out.println("table = " + table.getTotalTime());
         }

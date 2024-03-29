@@ -34,7 +34,6 @@ public class LectService {
             }
         }
         return true; // 충돌 없음
-
     }
 
     public static boolean isNotLectNumberConfilct(List<TimeTableResponseDTO.lectDetail> lectList,
@@ -81,7 +80,7 @@ public class LectService {
 
         return timeTable;
     }
-    public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName4(String name1, String name2, String name3, String name4) {
+    public List<TimeTableResponseDTO.timeTable> createMajorTimeTableName4(String name1, String name2, String name3, String name4) {
 
         List<Lect> majorLectList = lectRepository.findLectByName4(name1,name2,name3,name4);
         List<TimeTableResponseDTO.lectDetail> majorLectDetailList = TimeTableResponseDTO.lectDetail.from(majorLectList);
@@ -90,10 +89,10 @@ public class LectService {
         List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
 
         generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, 4);
-
+        List<TimeTableResponseDTO.timeTable> timeTableList = TimeTableResponseDTO.timeTable.of(timeTable);
         System.out.println("전공 강의 조합 개수 : " + majorCount);
 
-        return timeTable;
+        return timeTableList;
     }
     public List<List<TimeTableResponseDTO.lectDetail>> createMajorTimeTableName5(String name1, String name2, String name3, String name4, String name5) {
 
@@ -118,10 +117,8 @@ public class LectService {
 
         List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
 
-
         for (List<TimeTableResponseDTO.lectDetail> lectDetails : majorTimeTable) {
             generateCombinations1(entireLectDetailList, 0, lectDetails, timeTable, 6);
-
         }
         System.out.println("교선 강의 개수(교양과인성, 사회봉사 제외) : " + entireLect.size());
         System.out.println("전공 강의 조합 개수 : " + majorCount);
@@ -140,12 +137,10 @@ public class LectService {
 
         for (List<TimeTableResponseDTO.lectDetail> lectDetails : majorTimeTable) {
             generateCombinations1(entireLectDetailList, 0, lectDetails, timeTable, 6);
-
         }
         System.out.println("교선 강의 개수(교양과인성, 사회봉사 제외) : " + entireLect.size());
         System.out.println("전공 강의 조합 개수 : " + majorCount);
         System.out.println("전체 강의 조합 개수 : " + count);
-
 
         return timeTable;
     }
@@ -213,7 +208,8 @@ public class LectService {
 
         return timeTable;
     }
-    public List<TimeTableResponseDTO.timeTable> optimizationTimeTable(List<TimeTableResponseDTO.timeTable> timeTables){
+    //3시간 이상 강의 중간에 공강 껴있는 경우
+    public List<TimeTableResponseDTO.timeTable> filtering1(List<TimeTableResponseDTO.timeTable> timeTables){
 
         List<Integer> toRemoveIndexes = new ArrayList<>();
         for(int i = 0; i < timeTables.size(); i++){
@@ -259,6 +255,7 @@ public class LectService {
 
         return timeTables;
     }
+    //필터링 실험실
     public List<TimeTableResponseDTO.timeTable> createFilteredTimeTable(List<TimeTableResponseDTO.timeTable> majorTimeTable){
 
         List<Lect> entireLect = lectRepository.findLectByCmpDivNm("교선");
@@ -267,10 +264,26 @@ public class LectService {
         List<List<TimeTableResponseDTO.lectDetail>> timeTable = new ArrayList<>();
 
         for(int i = 0; i < majorTimeTable.size(); i++){
-            generateCombinations1(entireLectDetailList, 0, majorTimeTable.get(i).getTimetable(), timeTable, 4);
+            generateCombinations1(entireLectDetailList, 0, majorTimeTable.get(i).getTimetable(), timeTable, 5);
         }
+        //
         List<TimeTableResponseDTO.timeTable> timeTableList = TimeTableResponseDTO.timeTable.of(timeTable);
-        filterMorningLect(findWholeGG(filterOneLect(optimizationTimeTable(timeTableList))));
+
+        //3시간 이상 강의 중간에 공강 껴있는 경우, 제거
+        filtering1(timeTableList);
+
+        //하루 한 시간 강의 제거
+        filtering2(timeTableList);
+
+        //하루 공강 있는 시간표 남기기
+        filtering3(timeTableList);
+
+        //1교시 포함 시간표 제거
+        filtering4(timeTableList);
+
+        //7시간 이상 연강 있는 시간표 제거
+        filtering5(timeTableList);
+
         System.out.println("교선 강의 개수(교양과인성, 사회봉사, 성공학특강, 이러닝 제외) : " + entireLect.size());
         System.out.println("전공 강의 조합 개수 : " + majorCount);
         System.out.println("전체 강의 조합 개수 : " + timeTableList.size());
@@ -295,7 +308,7 @@ public class LectService {
     }
 
     //한 강의 있는 날 찾기
-    public List<TimeTableResponseDTO.timeTable> filterOneLect(List<TimeTableResponseDTO.timeTable> timeTables) {
+    public List<TimeTableResponseDTO.timeTable> filtering2(List<TimeTableResponseDTO.timeTable> timeTables) {
         // 제거하기 위한 인덱스 리스트
         List<Integer> toRemoveIndexes = new ArrayList<>();
 
@@ -330,7 +343,7 @@ public class LectService {
         return timeTables;
     }
     //1교시 포함 시간표 제거
-    public List<TimeTableResponseDTO.timeTable> filterMorningLect(List<TimeTableResponseDTO.timeTable> timeTables) {
+    public List<TimeTableResponseDTO.timeTable> filtering4(List<TimeTableResponseDTO.timeTable> timeTables) {
         List<Integer> toRemoveIndexes = new ArrayList<>();
         for (int i = 0; i < timeTables.size(); i++) {
             if(timeTables.get(i).getTotalTime().contains("1")) {
@@ -346,8 +359,8 @@ public class LectService {
 
         return timeTables;
     }
-    //통 공강 찾기
-    public List<TimeTableResponseDTO.timeTable> findWholeGG(List<TimeTableResponseDTO.timeTable> timeTables) {
+    //하루 공강 있는 시간표 남기기
+    public List<TimeTableResponseDTO.timeTable> filtering3(List<TimeTableResponseDTO.timeTable> timeTables) {
         // 제거하기 위한 인덱스 리스트
         List<Integer> toRemoveIndexes = new ArrayList<>();
 
@@ -380,7 +393,8 @@ public class LectService {
 
         return timeTables;
     }
-    public List<TimeTableResponseDTO.timeTable> find7HourKeepGoing(List<TimeTableResponseDTO.timeTable> timeTables){
+    //7시간 이상 연강있는 시간표 제거
+    public List<TimeTableResponseDTO.timeTable> filtering5(List<TimeTableResponseDTO.timeTable> timeTables){
 
         List<Integer> toRemoveIndexes = new ArrayList<>();
         for(int i = 0; i < timeTables.size(); i++){

@@ -1,9 +1,9 @@
 package com.example.demo.satto;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
 import java.util.List;
 
 @RestController
@@ -50,7 +50,7 @@ public class LectController {
                                                                          @RequestParam int libCount){
         List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTable(createDTO);
         List<TimeTableResponseDTO.timeTable> timeTable = TimeTableResponseDTO.timeTable.of(lectService.recommendLibLectures(majorTimaTable, libCount));
-        return lectService.optimizationTimeTable(lectService.filterOneLect(lectService.findWholeGG(timeTable)));
+        return lectService.filtering1(lectService.filtering2(lectService.filtering3(timeTable)));
     }
 
     @GetMapping("/recommendedLibLects/test")
@@ -60,12 +60,12 @@ public class LectController {
         return lectService.recommendLibLectures(majorTimaTable, libCount);
     }
 
-    @GetMapping("/recommendedLibLects/test4")
-    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects4(@RequestBody dto4 dto4,
-                                                                         @RequestParam int libCount){
-        List<List<TimeTableResponseDTO.lectDetail>> majorTimaTable = lectService.createMajorTimeTableName4(dto4.getName1(), dto4.getName2(), dto4.getName3(), dto4.getName4());
-        return lectService.recommendLibLectures(majorTimaTable, libCount);
-    }
+//    @GetMapping("/recommendedLibLects/test4")
+//    public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects4(@RequestBody dto4 dto4,
+//                                                                         @RequestParam int libCount){
+//        List<TimeTableResponseDTO.timeTable> majorTimaTable = lectService.createMajorTimeTableName4(dto4.getName1(), dto4.getName2(), dto4.getName3(), dto4.getName4());
+//        return lectService.recommendLibLectures(majorTimaTable, libCount);
+//    }
 
     @GetMapping("/recommendedLibLects/test5")
     public List<List<TimeTableResponseDTO.lectDetail>> recommendLibLects5(@RequestBody dto5 dto5,
@@ -80,4 +80,9 @@ public class LectController {
         return lectService.createFilteredTimeTable(majorTimaTable);
     }
 
+    @GetMapping("/presentationTest")
+    public List<TimeTableResponseDTO.timeTable> filterTest(@RequestBody dto4 dto4) {
+        List<TimeTableResponseDTO.timeTable> majorTimeTable = lectService.createMajorTimeTableName4(dto4.getName1(), dto4.getName2(), dto4.getName3(), dto4.getName4());
+        return lectService.createFilteredTimeTable(majorTimeTable);
+    }
 }
